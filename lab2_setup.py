@@ -170,5 +170,5 @@ def get_acc_angles(a):
     return np.array([ϕ, θ])
 
 
-
+# IMU()
 print("Lab 2 is set up")
