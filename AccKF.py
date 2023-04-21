@@ -7,7 +7,8 @@ class AccKF():
     def __init__(self):
         self.ts = 0.01
         self.n = 4
-        self.ntime = 1000
+        self.ntime = 100
+        self.g = 9.8 # m/s
 
         self.Qc = 1
         self.Rc = np.diag([0.1, 0.1])
@@ -33,8 +34,8 @@ class AccKF():
 
 
 
-        self.imu = lab2_setup.IMU()
-        time.sleep(1.0)
+        # self.imu = lab2_setup.IMU()
+        # time.sleep(1.0)
 
 
     def propagate(self):
@@ -49,9 +50,9 @@ class AccKF():
 
         # update x and Q estimate with y
         y = np.zeros((2,1))
-        acc = self.imu.get_acc()
-        y[0] = acc[0]
-        y[1] = acc[1]
+        # acc = self.imu.get_acc()
+        # y[0] = np.arcsin(acc[0]/self.g)
+        # y[1] = np.arctan(acc[1]/acc[2])
         xkk = self.x + L@(y - self.C@self.x)
         Qkk = (np.eye(self.n) - L@self.C)@self.Q
 
@@ -74,6 +75,25 @@ acckf.run()
 
 t = np.linspace(0,acckf.ntime*acckf.ts,acckf.ntime)
 
-plt.figure()
-plt.plot(t,acckf.xh[0,0,:])
+plt.figure(1)
+plt.plot(t,acckf.xh[0,0,:], label="$\phi$")
+plt.plot(t,acckf.xh[2,0,:], label="$\\theta$")
+# plt.plot(t,acckf.xh[2,0,:], label="$\psi$")
+plt.xlabel("Time [s]")
+plt.ylabel("Orientation [rad]")
+plt.title("Accelerometer Only: State")
+plt.legend()
+plt.show()
+
+plt.figure(2)
+plt.plot(t,acckf.Qh[0,0,:], label="$Q_1$")
+plt.plot(t,acckf.Qh[1,1,:], label="$Q_2$")
+plt.plot(t,acckf.Qh[2,2,:], label="$Q_3$")
+plt.plot(t,acckf.Qh[3,3,:], label="$Q_4$")
+# plt.plot(t,Qh[4,4,:], label="$Q_5$")
+# plt.plot(t,Qh[5,5,:], label="$Q_6$")
+plt.xlabel("Time [s]")
+plt.title("Accelerometer Only: Q")
+plt.ylabel("Q")
+plt.legend()
 plt.show()
