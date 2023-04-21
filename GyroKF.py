@@ -7,7 +7,7 @@ class GyroKF():
     def __init__(self):
         self.ts = 0.01
         self.n = 6
-        self.ntime = 100
+        self.ntime = 1000
 
         self.Qc = 1
         self.Rc = np.diag([0.1, 0.1, 0.1])
@@ -37,8 +37,8 @@ class GyroKF():
 
 
 
-        # self.imu = lab2_setup.IMU()
-        # time.sleep(1.0)
+        self.imu = lab2_setup.IMU()
+        time.sleep(1.0)
 
 
     def propagate(self):
@@ -52,11 +52,13 @@ class GyroKF():
 
         # update x and Q estimate with y
         y = np.zeros((3,1))
-        # acc = self.imu.get_gyr()
-        # y[0] = acc[0]
-        # y[1] = acc[1]
-        # y[2] = acc[2]
+        gyr = self.imu.get_gyr()
+        y[0] = gyr[0]
+        y[1] = gyr[1]
+        y[2] = gyr[2]
+        # print(self.imu.get_acc())
         xkk = self.x + L@(y - self.C@self.x)
+        # print(y.T)
         Qkk = (np.eye(self.n) - L@self.C)@self.Q
 
         # update x and Q

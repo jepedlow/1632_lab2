@@ -7,7 +7,7 @@ class AccKF():
     def __init__(self):
         self.ts = 0.01
         self.n = 4
-        self.ntime = 100
+        self.ntime = 1000
         self.g = 9.8 # m/s
 
         self.Qc = 1
@@ -34,8 +34,8 @@ class AccKF():
 
 
 
-        # self.imu = lab2_setup.IMU()
-        # time.sleep(1.0)
+        self.imu = lab2_setup.IMU()
+        time.sleep(1.0)
 
 
     def propagate(self):
@@ -50,11 +50,15 @@ class AccKF():
 
         # update x and Q estimate with y
         y = np.zeros((2,1))
-        # acc = self.imu.get_acc()
-        # y[0] = np.arcsin(acc[0]/self.g)
-        # y[1] = np.arctan(acc[1]/acc[2])
+        acc = self.imu.get_acc()
+        if np.abs(acc[0]/self.g) > 1.0:
+            y[0] = 0
+        else:
+            y[0] = np.arcsin(acc[0]/self.g)
+        y[1] = np.arctan(acc[1]/acc[2])
         xkk = self.x + L@(y - self.C@self.x)
         Qkk = (np.eye(self.n) - L@self.C)@self.Q
+        
 
         # update x and Q
         x_new = self.Ad@xkk
